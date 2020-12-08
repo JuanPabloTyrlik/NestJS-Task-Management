@@ -19,7 +19,7 @@ export class UserRepository extends Repository<User> {
         try {
             await user.save();
         } catch (error) {
-            if (error.code === ErrorCodesEnum.DUPLICATE_USERNAME) {
+            if (error.code === ErrorCodesEnum.UNIQUE_VIOLATION) {
                 throw new ConflictException('Username already exists');
             } else {
                 throw new InternalServerErrorException();
@@ -29,5 +29,15 @@ export class UserRepository extends Repository<User> {
 
     private async hashPassword(password: string, salt: string) {
         return bcrypt.hash(password, salt);
+    }
+
+    async validateUserPassword(authCredentialsDto: AuthCredentialsDto) {
+        const { username, password } = authCredentialsDto;
+        const user = await this.findOne({ username });
+        if (user && (await user.validatePassword(password))) {
+            return user.username;
+        } else {
+            return null;
+        }
     }
 }
