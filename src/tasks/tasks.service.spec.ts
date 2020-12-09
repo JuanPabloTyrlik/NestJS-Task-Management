@@ -13,9 +13,15 @@ const mockUser = {
     salt: '',
 };
 
+const mockTask = {
+    title: 'Task title',
+    description: 'Task description',
+};
+
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
     findOne: jest.fn(),
+    createTask: jest.fn(),
 });
 
 describe('TasksService', () => {
@@ -33,8 +39,9 @@ describe('TasksService', () => {
             ],
         }).compile();
 
-        tasksService = await module.get<TasksService>(TasksService);
-        taskRepository = await module.get<TaskRepository>(TaskRepository);
+        tasksService = module.get<TasksService>(TasksService);
+        taskRepository = module.get<TaskRepository>(TaskRepository);
+        jest.clearAllMocks();
     });
 
     describe('getTasks', () => {
@@ -60,10 +67,6 @@ describe('TasksService', () => {
 
     describe('getTaskById', () => {
         it('should call taskRepository.findOne and return the task', async () => {
-            const mockTask = {
-                title: 'Task title',
-                description: 'Task description',
-            };
             (<jest.Mock>taskRepository.findOne).mockResolvedValue(mockTask);
 
             const result = await tasksService.getTaskById(1, <User>mockUser);
@@ -78,6 +81,21 @@ describe('TasksService', () => {
             expect(tasksService.getTaskById(1, <User>mockUser)).rejects.toThrow(
                 NotFoundException,
             );
+        });
+    });
+
+    describe('createTask', () => {
+        it('should create a new Task', async () => {
+            (<jest.Mock>taskRepository.createTask).mockResolvedValue(mockTask);
+            const result = await tasksService.createTask(
+                mockTask,
+                <User>mockUser,
+            );
+            expect(taskRepository.createTask).toHaveBeenCalledWith(
+                mockTask,
+                mockUser,
+            );
+            expect(result).toEqual(mockTask);
         });
     });
 });
