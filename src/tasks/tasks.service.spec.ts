@@ -22,6 +22,7 @@ const mockTaskRepository = () => ({
     getTasks: jest.fn(),
     findOne: jest.fn(),
     createTask: jest.fn(),
+    delete: jest.fn(),
 });
 
 describe('TasksService', () => {
@@ -96,6 +97,50 @@ describe('TasksService', () => {
                 mockUser,
             );
             expect(result).toEqual(mockTask);
+        });
+    });
+
+    describe('deleteTaskById', () => {
+        it('should delete a task', async () => {
+            (<jest.Mock>taskRepository.delete).mockResolvedValue({
+                affected: 1,
+            });
+            expect(taskRepository.delete).not.toHaveBeenCalled();
+            expect(
+                tasksService.deleteTaskById(1, <User>mockUser),
+            ).resolves.toBeUndefined();
+            expect(taskRepository.delete).toHaveBeenCalledWith({
+                id: 1,
+                user: mockUser,
+            });
+        });
+        it('should throw an error', async () => {
+            (<jest.Mock>taskRepository.delete).mockResolvedValue({
+                affected: 0,
+            });
+            expect(
+                tasksService.deleteTaskById(1, <User>mockUser),
+            ).rejects.toThrow(NotFoundException);
+        });
+    });
+    describe('updateTaskStatusById', () => {
+        it('should update a task', async () => {
+            const mockTask = {
+                title: 'Test title',
+                description: 'Test description',
+                status: TaskStatus.OPEN,
+                save: jest.fn(),
+            };
+            tasksService.getTaskById = jest.fn().mockResolvedValue(mockTask);
+            expect(tasksService.getTaskById).not.toHaveBeenCalled();
+            const result = await tasksService.updateTaskStatusById(
+                1,
+                TaskStatus.IN_PROGRESS,
+                <User>mockUser,
+            );
+            expect(tasksService.getTaskById).toHaveBeenCalled();
+            expect(mockTask.save).toHaveBeenCalled();
+            expect(result.status).toMatch(TaskStatus.IN_PROGRESS);
         });
     });
 });
