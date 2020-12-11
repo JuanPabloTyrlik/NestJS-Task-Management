@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Test } from '@nestjs/testing';
 import { UserRepository } from './user.repository';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
@@ -95,10 +96,8 @@ describe('UserRepository', () => {
 
     describe('hashPassword', () => {
         it('should generate the hash', async () => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             bcrypt.hash = jest.fn().mockResolvedValue('testHash');
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const result = await userRepository.hashPassword(
                 'SomePassword',
