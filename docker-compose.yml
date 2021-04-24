@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13.2
+    environment:
+      POSTGRES_DB: taskmanagement
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - /var/lib/postgresql/data

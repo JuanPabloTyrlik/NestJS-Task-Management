@@ -1,3 +1,3 @@
 export enum ErrorCodesEnum {
-    UNIQUE_VIOLATION = '23505',
+  UNIQUE_VIOLATION = '23505',
 }
